@@ -3,22 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CS7637 KBAI &mdash; Mock Exam 1</title>
+<title>CS7637 KBAI &mdash; Mock Exams</title>
 <style>
   :root{--ink:#1a1a1a;--soft:#666;--line:#ddd;--bg:#fbfbfa;--fill:#f0efed}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;
     font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
   .wrap{max-width:720px;margin:0 auto;padding:0 20px 100px}
-  header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);
-    padding:14px 0;display:flex;align-items:center;gap:14px;z-index:5}
-  header b{font-weight:600}
-  header .sc{margin-left:auto;font-variant-numeric:tabular-nums}
-  header button{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;
+  header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:5}
+  .bar{max-width:720px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:8px}
+  .bar .ttl{font-weight:600}
+  .bar .sc{margin-left:auto;font-variant-numeric:tabular-nums}
+  .bar button.rst{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;
     border-radius:6px;padding:5px 11px;cursor:pointer;color:var(--soft)}
-  header button:hover{border-color:var(--soft)}
+  .bar button.rst:hover{border-color:var(--soft)}
+  .tabs{max-width:720px;margin:0 auto;padding:0 20px;display:flex;gap:4px}
+  .tabs button{font:inherit;font-weight:500;background:none;border:none;border-bottom:2px solid transparent;
+    padding:9px 14px;cursor:pointer;color:var(--soft);margin-bottom:-1px}
+  .tabs button.on{color:var(--ink);border-bottom-color:var(--ink)}
   h1{font-size:1.5rem;font-weight:600;margin:30px 0 4px}
   .intro{color:var(--soft);font-size:.93rem;margin:0 0 8px}
+  .pane{display:none}.pane.on{display:block}
   .q{border-top:1px solid var(--line);padding:26px 0}
   .qn{font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--soft);margin-bottom:6px}
   .qt{font-weight:500;margin:0 0 14px}
@@ -47,16 +52,23 @@
 </style>
 </head>
 <body>
-<header><b>Mock Exam 1</b><span class="sc">Score <b id="sc">0</b> / 110</span>
-  <button id="reset">Reset</button></header>
+<header>
+  <div class="bar"><span class="ttl">KBAI Mock Exams</span>
+    <span class="sc">Score <b id="sc">0</b> / 110</span>
+    <button class="rst" id="reset">Reset this exam</button></div>
+  <div class="tabs"><button data-tab="0" class="on">Mock Exam 1</button>
+    <button data-tab="1">Mock Exam 2</button></div>
+</header>
 <div class="wrap">
-  <h1>Knowledge-Based AI &mdash; Mock Exam 1</h1>
+  <h1 id="h1">Knowledge-Based AI &mdash; Mock Exam 1</h1>
   <p class="intro">22 multi-select questions &middot; 5 options each &middot; 1&ndash;4 are correct. You earn +1 per option correctly
   selected and +1 per option correctly left blank (5 pts each). Selecting none or all five scores 0.</p>
-  <div id="exam"></div>
+  <div class="pane on" id="pane0"></div>
+  <div class="pane" id="pane1"></div>
 </div>
 <script>
-const Q=[
+const EXAMS=[
+[
 {n:"Q1 &middot; Scenario",t:"A delivery robot heads to its charging dock by always taking the step that most reduces its straight-line distance to the dock &mdash; but a wall juts out between it and the dock and it keeps getting pinned against it. Which statements are accurate?",
 o:["The robot is using means-ends analysis.",
 "Getting pinned shows how always reducing the difference can fail to reach the goal.",
@@ -219,19 +231,195 @@ o:["This is rule-based adaptation using a heuristic.",
 "Storing every past case would speed future retrieval with no downside.",
 "Using a model of the domain to bridge old and new would be model-based adaptation."],
 c:[0,2,4],e:"A rule of thumb = rule-based adaptation via a heuristic (A), which works often but not always (B false). Leftover sub-problems can be handled by recursive CBR (C); a domain model bridging old&rarr;new is model-based adaptation (E). Hoarding every case triggers the utility problem and slows retrieval (D false)."}
+],
+[
+{n:"Q1 &middot; Scenario",t:"A chef-bot is asked for a gluten-free version of a lasagna it already knows how to make. It keeps most of the steps, consults a model of which ingredients contain gluten, and substitutes those. Which statements are correct?",
+o:["This is model-based adaptation.",
+"The known lasagna recipe is the retrieved case.",
+"Substituting the ingredients is the reuse/adaptation step.",
+"This is learning by recording cases, since nothing about the recipe changes.",
+"If a taste-test reveals a problem, re-adapting or retrieving a different case is part of the (non-linear) CBR process."],
+c:[0,1,2,4],e:"Using a domain model (which ingredients have gluten) to bridge old&rarr;new is model-based adaptation (A). The recipe is the retrieved case (B); swapping ingredients is reuse (C); and CBR can loop back after a failed evaluation (E). It clearly tweaks the recipe, so it&rsquo;s CBR, not mere recording (D false)."},
+
+{n:"Q2 &middot; Valid inference",t:"A knowledge base contains: (1) Rain &rarr; WetGround, (2) WetGround &rarr; SlipperyRoad, and the fact (3) Rain. Which conclusions follow by SOUND inference?",
+o:["WetGround, by modus ponens.",
+"SlipperyRoad, by chaining the two rules.",
+"From observing SlipperyRoad, you could conclude Rain with certainty.",
+"If instead you observed &not;SlipperyRoad, you could conclude &not;Rain by modus tollens.",
+"The first rule lets you conclude Rain whenever WetGround holds."],
+c:[0,1,3],e:"Modus ponens gives WetGround (A), then SlipperyRoad (B). Modus tollens runs the chain backward from a false consequent (D). Concluding Rain from SlipperyRoad (C) or from WetGround (E) is affirming-the-consequent &mdash; an invalid converse error."},
+
+{n:"Q3 &middot; Contrast the definitions",t:"Which statements correctly contrast MONOTHETIC and POLYTHETIC concept definitions?",
+o:["A monothetic definition rests on a single necessary-and-sufficient condition.",
+"A polythetic definition uses a family of features, none of which is individually required.",
+"&ldquo;A triangle is a three-sided polygon&rdquo; is a monothetic definition.",
+"Polythetic concepts are always easier to program than monothetic ones.",
+"A loose concept like &ldquo;game,&rdquo; with overlapping family traits, is better treated as polythetic."],
+c:[0,1,2,4],e:"Monothetic = one defining condition (A,C); polythetic = a family of typical traits with none mandatory (B,E). Polythetic concepts are generally HARDER to pin down and program, not easier (D false)."},
+
+{n:"Q4 &middot; Match the memory",t:"An agent stores three things: (i) the fact that whales are mammals, (ii) its memory of failing a specific quiz last Tuesday, (iii) the skill of converting a fraction to a decimal. Which mappings are correct?",
+o:["(i) is semantic knowledge.",
+"(ii) is episodic knowledge.",
+"(iii) is procedural knowledge.",
+"(iii) would naturally be encoded as production rules.",
+"(ii) is procedural knowledge."],
+c:[0,1,2,3],e:"General facts = semantic (i); a specific remembered event = episodic (ii); a how-to skill = procedural, encoded as production rules (iii). So A&ndash;D hold; calling the episodic memory &ldquo;procedural&rdquo; (E) is wrong."},
+
+{n:"Q5 &middot; Representations",t:"Which of the following are accurate statements about knowledge representations?",
+o:["A representation is a language together with the content expressed in it.",
+"Two different representations of the same problem can differ greatly in how easy the problem is to solve.",
+"A nutrition label is a representation that makes some facts explicit while leaving relationships (e.g., between fat and calories) implicit.",
+"The best representation is always the one that includes every available detail.",
+"The choice of representation has no effect on which inferences are easy to draw."],
+c:[0,1,2],e:"Representation = language + content (A); the right one makes a problem easy, the wrong one hard (B); real representations expose some things and hide others, like a nutrition label (C). More detail isn&rsquo;t automatically better (D false), and representation strongly shapes what&rsquo;s easy to infer (E false)."},
+
+{n:"Q6 &middot; Scenario",t:"A team evolves solutions with a genetic algorithm: candidate solutions are recombined and mutated, scored by a fitness function, and the best are kept for the next round. Which statements are accurate?",
+o:["This is a form of generate-and-test.",
+"Recombination and mutation act as the generator.",
+"The fitness function acts as the tester.",
+"Because it explores many candidates, it is guaranteed to find the global optimum.",
+"It is typically used when the solution space is huge and neither part is especially &ldquo;smart.&rdquo;"],
+c:[0,1,2,4],e:"A genetic algorithm is generate-and-test (A): the variation operators generate (B), the fitness function tests (C), and it suits large spaces with relatively unintelligent parts (E). Exploring many candidates gives no guarantee of the global optimum (D false)."},
+
+{n:"Q7 &middot; Two examples in a row",t:"A learner&rsquo;s current definition of &ldquo;cup&rdquo; requires a handle. It is shown a POSITIVE example (a handle-less paper cup), then later a NEGATIVE example (a bowl) that its newly loosened definition now wrongly accepts. Which statements are correct?",
+o:["The handle-less cup forces generalization, e.g. drop-link on &ldquo;has handle.&rdquo;",
+"The wrongly-accepted bowl forces specialization.",
+"A require-link or forbid-link could exclude the bowl.",
+"Both adjustments are made from only a few labeled examples, leaning on prior knowledge.",
+"Generalization is the right response to exclude the bowl."],
+c:[0,1,2,3],e:"A missed positive &rarr; generalize (drop-link) (A). A wrongly-covered negative &rarr; specialize (B), e.g. require-/forbid-link (C). It all happens from few examples plus background knowledge (D). You specialize &mdash; not generalize &mdash; to exclude the bowl (E false)."},
+
+{n:"Q8 &middot; Inheritance",t:"A &ldquo;Penguin&rdquo; frame is a sub-class of a &ldquo;Bird&rdquo; frame, and Bird has a slot can-fly with default &ldquo;yes.&rdquo; Which statements are correct?",
+o:["Penguin inherits the slots defined on Bird.",
+"Penguin can override the can-fly default to &ldquo;no.&rdquo;",
+"A default like can-fly = &ldquo;yes&rdquo; resembles an initial value set by a constructor in object-oriented programming.",
+"Inheritance flows from the instance up to the super-class.",
+"&ldquo;Tweety, a specific penguin&rdquo; would be an instance of the Penguin frame."],
+c:[0,1,2,4],e:"Sub-classes inherit slots (A) and can override defaults (B); defaults parallel OOP constructor values (C); a specific penguin is an instance (E). Inheritance flows DOWN &mdash; super-class &rarr; sub-class &rarr; instance &mdash; not up (D false)."},
+
+{n:"Q9 &middot; Scenario",t:"A student tackles &ldquo;write a research paper&rdquo; by breaking it into &ldquo;gather sources,&rdquo; &ldquo;draft,&rdquo; and &ldquo;edit,&rdquo; solving each in turn. Which statements are correct?",
+o:["This is problem reduction.",
+"Problem reduction tells the student which sub-task to do first.",
+"The sub-solutions are composed into the overall solution.",
+"Problem reduction is a strong, domain-specific method with optimality guarantees.",
+"Knowledge is what suggests how to decompose the problem."],
+c:[0,2,4],e:"Breaking a problem into sub-problems is problem reduction (A); their solutions compose into the whole (C); and knowledge guides the decomposition (E). It does NOT prescribe the order of sub-tasks (B false), and it is a weak/universal method without guarantees (D false)."},
+
+{n:"Q10 &middot; Match the school",t:"Match each system to the school of AI it best represents. Which pairings are correct?",
+o:["An autopilot that flies the plane as efficiently as possible &rarr; acting optimally.",
+"A statistical algorithm tuned purely to optimize predictions &rarr; thinking optimally.",
+"Knowledge-based AI &rarr; thinking like humans.",
+"An improvisational theater robot &rarr; acting like humans.",
+"A chess engine that simply plays the perfect move &rarr; acting like humans."],
+c:[0,1,2,3],e:"The four schools split on think-vs-act and human-like-vs-optimal: autopilot acts optimally (A), a prediction optimizer thinks optimally (B), KBAI thinks like humans (C), an improv robot acts like humans (D). A perfect-move chess engine is optimal, not &ldquo;like humans&rdquo; (E false)."},
+
+{n:"Q11 &middot; Feature space",t:"A route planner represents each past delivery by four numbers: origin-x, origin-y, destination-x, destination-y. Which statements are correct?",
+o:["This is a 4-dimensional feature space (k = 4).",
+"The most similar past route is found with a distance metric over those four features.",
+"Choosing the closest route by origin alone could miss a better overall match.",
+"The closest stored route&rsquo;s plan is always directly usable with no adaptation.",
+"This is a k-nearest-neighbor style of representation."],
+c:[0,1,2,4],e:"Four features = a 4-D space (A), searched by a distance metric (B), which is exactly k-NN (E). Matching on only one feature can miss the best overall case (C). Being closest never guarantees the plan transfers unchanged (D false)."},
+
+{n:"Q12 &middot; CNF mechanics",t:"You are converting the sentence A &rarr; (B &and; C) toward conjunctive normal form (CNF). Which steps or results are correct?",
+o:["First rewrite the implication as &not;A &or; (B &and; C).",
+"Distribute to obtain (&not;A &or; B) &and; (&not;A &or; C).",
+"De Morgan&rsquo;s law is required to push a negation inward here.",
+"The final CNF is a conjunction of two disjunctive clauses.",
+"It could simply be left as an implication and still count as CNF."],
+c:[0,1,3],e:"Eliminate the implication (A), then use the distributive law to get two clauses (B,D). No negation sits over a conjunction here, so De Morgan isn&rsquo;t needed (C false); and an implication is not CNF (E false)."},
+
+{n:"Q13 &middot; The test",t:"Which statements about the Raven&rsquo;s Progressive Matrices and its role in this course are accurate?",
+o:["The test is entirely visual and uses no language.",
+"Its problems take the form &ldquo;A is to B as C is to ?&rdquo;",
+"The 2&times;1 problems are a simplification used to bootstrap agent-building, not part of the original test.",
+"Solving it mainly involves recalling memorized facts.",
+"Matching both human scores and human error patterns is the stronger evidence of human-like reasoning."],
+c:[0,1,2,4],e:"Raven&rsquo;s is purely visual (A), poses analogy problems (B), and the 2&times;1 form is a course warm-up rather than original content (C); matching errors (not just scores) is the key evidence (E). It tests reasoning, not fact recall (D false)."},
+
+{n:"Q14 &middot; Storage structure",t:"An agent organizes its stored cases in a discrimination tree. Which statements are correct?",
+o:["The actual cases sit at the leaf nodes.",
+"Internal nodes pose questions about indexing features.",
+"Retrieval can be faster than scanning a flat list of every case.",
+"To add a case indistinguishable from an existing one, a new question node can be introduced.",
+"Storing every case ever encountered improves retrieval speed without limit."],
+c:[0,1,2,3],e:"Cases live at the leaves (A); internal nodes ask discriminating questions (B); this beats linear scanning (C) and grows incrementally by adding question nodes (D). Endlessly hoarding cases hits the utility problem and slows retrieval (E false)."},
+
+{n:"Q15 &middot; Which rules fire",t:"Working memory currently holds: light = red, pedestrian = present. The rules are: R1: IF light = red THEN stop; R2: IF light = green THEN go; R3: IF pedestrian = present THEN yield. Which statements are accurate?",
+o:["R1 fires.","R2 fires.","R3 fires.",
+"A rule fires when its antecedents match the contents of working memory.",
+"R2 fires simply because it exists in long-term memory."],
+c:[0,2,3],e:"R1 and R3 match working memory and fire (A,C); firing is triggered by antecedents matching working memory (D). R2&rsquo;s condition (light = green) isn&rsquo;t met, so it does not fire (B), and merely existing in long-term memory doesn&rsquo;t cause firing (E false)."},
+
+{n:"Q16 &middot; Why classify",t:"Which statements explain why sorting percepts into equivalence classes is useful?",
+o:["A direct table from every possible percept-combination to actions would be astronomically large.",
+"Grouping many percepts into one class shrinks the mapping to a manageable size.",
+"Different raw symptoms can map to the same underlying concept or diagnosis.",
+"Classification removes the need for any knowledge of the domain.",
+"Equivalence classes let the agent act on the class rather than each raw situation."],
+c:[0,1,2,4],e:"The raw percept-to-action table explodes combinatorially (A); classes collapse it (B,E) and let varied percepts share one concept (C). Classification relies on domain knowledge &mdash; it doesn&rsquo;t remove the need for it (D false)."},
+
+{n:"Q17 &middot; The method",t:"Means-ends analysis chooses operators based on the difference between the current and goal states. Which statements are accurate?",
+o:["It needs a way to measure the difference between two states.",
+"It maps a kind of difference to the operators that can reduce it.",
+"An operator may be inapplicable now, creating a sub-problem of first enabling it.",
+"It always reduces the number of moves to the theoretical minimum.",
+"It is classified as a universal (weak) method."],
+c:[0,1,2,4],e:"Means-ends analysis measures differences (A), links differences to difference-reducing operators (B), and can spawn sub-problems when an operator&rsquo;s preconditions aren&rsquo;t met (C); it is a weak/universal method (E). It offers no guarantee of a minimal-length solution (D false)."},
+
+{n:"Q18 &middot; Apply to Raven&rsquo;s",t:"To solve a 2&times;1 Raven&rsquo;s problem (A &rarr; B, then C &rarr; ?) with a semantic-network approach, you would&hellip;",
+o:["Represent the objects and within-figure relationships in A and in B.",
+"Represent the transformation that maps A to B (e.g. &ldquo;expanded,&rdquo; &ldquo;deleted&rdquo;).",
+"Apply an analogous transformation to C and compare it against the answer options.",
+"Require recording precise pixel coordinates to succeed.",
+"Use a consistent transformation vocabulary across the figures."],
+c:[0,1,2,4],e:"You represent each figure&rsquo;s objects/relationships (A), capture the A&rarr;B transformation (B), apply it to C and test against options (C), all with a consistent transformation vocabulary (E). Exact pixel coordinates are unnecessary detail (D false)."},
+
+{n:"Q19 &middot; The three processes",t:"Which statements about reasoning, learning, and memory in KBAI are accurate?",
+o:["Reasoning often requires retrieving knowledge from memory.",
+"Reasoning can itself produce new knowledge to be learned and stored.",
+"They are best designed as three completely independent modules.",
+"The coupling of these processes is called deliberation.",
+"Having more knowledge in memory can enable more learning."],
+c:[0,1,3,4],e:"Reasoning draws on memory (A) and generates knowledge to store (B); their coupling is deliberation (D); and more knowledge enables more learning (E). The course&rsquo;s stance is the opposite of treating them as independent modules (C false)."},
+
+{n:"Q20 &middot; Sort the heuristics",t:"Which of the following are GENERALIZATION heuristics &mdash; used when a positive example is not yet covered by the current definition?",
+o:["Drop-link.","Climb-tree.","Enlarge-set.","Forbid-link.","Close-interval."],
+c:[0,1,2,4],e:"Generalization loosens a definition to admit a missed positive: drop-link, climb-tree, enlarge-set, and close-interval (A,B,C,E). Forbid-link tightens the definition &mdash; it is a specialization heuristic (D)."},
+
+{n:"Q21 &middot; Reach and limits of frames",t:"Which statements about what frames can and cannot do are accurate?",
+o:["Frames let an agent infer unstated but typical details through defaults.",
+"A single frame automatically resolves all ambiguity in a complex sentence.",
+"Frames represent stereotyped situations.",
+"Frames can be linked (a filler pointing to another frame) to handle multi-sentence discourse.",
+"Frames hold the same information as semantic networks, just in a different notation."],
+c:[0,2,3,4],e:"Frames supply default-driven inferences (A), model stereotypes (C), link together for discourse (D), and are notationally equivalent to semantic nets (E). A frame alone does NOT resolve all ambiguity &mdash; extra reasoning is still required (B false)."},
+
+{n:"Q22 &middot; Match the reasoning",t:"Match each reasoning type to its scenario. Which pairings are correct?",
+o:["A doctor infers a disease from observed symptoms &rarr; abduction.",
+"Concluding &ldquo;the ground will be wet&rdquo; from &ldquo;it is raining&rdquo; plus a rule &rarr; deduction.",
+"Generalizing &ldquo;swans are white&rdquo; after seeing many white swans &rarr; induction.",
+"Deduction reasons from effects back to their causes.",
+"Abduction always yields guaranteed-correct conclusions."],
+c:[0,1,2],e:"Symptoms&rarr;disease is abduction (A); rule + cause&rarr;effect is deduction (B); many examples&rarr;general rule is induction (C). Reasoning from effects back to causes is abduction, not deduction (D false), and abduction is a best-guess that is not guaranteed correct (E false)."}
+]
 ];
-const L="ABCDE", exam=document.getElementById('exam'), scores=Array(Q.length).fill(null);
-Q.forEach((q,i)=>{
+const L="ABCDE";
+const scores=[Array(22).fill(null),Array(22).fill(null)];
+let active=0;
+const panes=[document.getElementById('pane0'),document.getElementById('pane1')];
+EXAMS.forEach((set,ex)=>set.forEach((q,i)=>{
   const d=document.createElement('div'); d.className='q';
   d.innerHTML=`<div class="qn">${q.n}</div><p class="qt">${q.t}</p>`+
     q.o.map((t,j)=>`<label data-j="${j}"><input type="checkbox">
       <span class="tx"><b class="ltr">${L[j]}.</b> ${t}</span><span class="fb"></span></label>`).join('')+
     `<div class="foot"><button>Check answer</button><span class="pts"></span></div>
      <div class="exp"><b>Correct: ${q.c.map(x=>L[x]).join(", ")}.</b> ${q.e}</div>`;
-  exam.appendChild(d);
-  d.querySelector('button').onclick=()=>grade(i,d,q);
-});
-function grade(i,d,q){
+  panes[ex].appendChild(d);
+  d.querySelector('.foot button').onclick=()=>grade(ex,i,d,q);
+}));
+function total(ex){return scores[ex].reduce((a,b)=>a+(b||0),0);}
+function grade(ex,i,d,q){
   const labs=[...d.querySelectorAll('label')], sel=labs.map(l=>l.querySelector('input').checked);
   const n=sel.filter(Boolean).length, cset=new Set(q.c);
   d.classList.add('graded');
@@ -244,14 +432,34 @@ function grade(i,d,q){
   });
   let p=0; const warn=(n===0||n===5);
   if(!warn) for(let j=0;j<5;j++){ if(cset.has(j)===sel[j]) p++; }
-  scores[i]=p;
+  scores[ex][i]=p;
   const pe=d.querySelector('.pts'); pe.classList.add('show');
   pe.innerHTML= warn? `0 / 5 &mdash; you picked ${n===0?'none':'all five'}, so the exam awards 0 here.` : `${p} / 5 points`;
   d.querySelector('.exp').classList.add('show');
-  d.querySelector('button').textContent='Checked';
-  document.getElementById('sc').textContent=scores.reduce((a,b)=>a+(b||0),0);
+  d.querySelector('.foot button').textContent='Checked';
+  if(ex===active) document.getElementById('sc').textContent=total(ex);
 }
-document.getElementById('reset').onclick=()=>{ location.reload(); };
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  active=+b.dataset.tab;
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  panes.forEach((p,k)=>p.classList.toggle('on',k===active));
+  document.getElementById('h1').innerHTML='Knowledge-Based AI &mdash; Mock Exam '+(active+1);
+  document.getElementById('sc').textContent=total(active);
+  window.scrollTo({top:0});
+});
+document.getElementById('reset').onclick=()=>{
+  scores[active].fill(null);
+  panes[active].querySelectorAll('input').forEach(i=>i.checked=false);
+  panes[active].querySelectorAll('.q').forEach(c=>{
+    c.classList.remove('graded');
+    c.querySelector('.pts').classList.remove('show');
+    c.querySelector('.exp').classList.remove('show');
+    c.querySelector('.foot button').textContent='Check answer';
+    c.querySelectorAll('label').forEach(l=>l.className='');
+  });
+  document.getElementById('sc').textContent=0;
+  window.scrollTo({top:0});
+};
 </script>
 </body>
 </html>
